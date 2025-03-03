@@ -35,7 +35,7 @@ and the details for read operations
 """
 
 import json
-from logging import Logger, getLogger
+from logging import Logger, getLogger, basicConfig, DEBUG
 from pathlib import Path
 from typing import Generator, Optional
 
@@ -73,7 +73,8 @@ class CommonOutputFormatter:
         # and manually check for duplictaes, but that seems more untidy
         # TODO: This is the whole archive directory - what happens if I want
         # to specify a single run? How full do these get?
-
+        basicConfig(level=DEBUG)
+        print(log.handlers)
         self._path: Path
         self._file_list: Generator[Path, None, None]
 
@@ -86,6 +87,7 @@ class CommonOutputFormatter:
         self._find_all_results_files_in_directory()
 
         self._find_all_testrun_ids()
+        log.debug(self._all_test_run_ids)
         for id in self._all_test_run_ids:
             results: TestRunResult = TestRunResult(self._directory, id, self._filename_root)
 
@@ -132,6 +134,7 @@ class CommonOutputFormatter:
             )
         )
         self._path = Path(self._directory)
+        log.debug(self._path)
         # this gives a generator where each contained object is a Path of format:
         # <self._directory>/results/<iteration>/<run_id>/json_output.<vol_id>.<hostname>
         self._file_list = self._path.glob(f"**/{self._filename_root}.?")

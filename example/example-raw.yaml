@@ -1,8 +1,11 @@
 cluster:
   use_existing: True
-  osds_per_node: 24
-  clients: [192.168.122.249]
+  osds_per_node: 2
+  clients: [localhost]
   iterations: 2
+  conf_file: /Users/will.gorman/git/compute-nbs-api/scripts/ceph/local-setup/lima-clusters/ceph.c1.conf
+  ceph.conf: /Users/will.gorman/git/compute-nbs-api/scripts/ceph/local-setup/lima-clusters/ceph.c1.conf
+  
 
 benchmarks:
   rawfio:
@@ -32,7 +35,7 @@ benchmarks:
       # What is the filesystem
       client_fs: xfs
       concurrent_procs: 1
-      fio_cmd: '/usr/bin/fio'
+      fio_cmd: '/Users/will.gorman/git/cbt/.flox/run/aarch64-linux.cbt.dev/bin/fio'
       block_devices: [/dev/vdb]
 #      block_devices: [/dev/sda, /dev/sdb, /dev/sdc, /dev/sdd, /dev/sde, /dev/sdf, /dev/sdg, /dev/sdh, /dev/sdi, /dev/sdj, /dev/sdk, /dev/sdl, /dev/sdm, /dev/sdn]
 

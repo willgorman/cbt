@@ -219,6 +219,7 @@ class LibrbdFio(Benchmark):
             self.cluster.wait_start_io()
 
         if len(self.workloads) > 0:
+            logger.debug("WORKLOADS")
             # New style: execute the list of workloads
             self.run_workloads()
         else:
@@ -240,6 +241,8 @@ class LibrbdFio(Benchmark):
 
         # Finally, get the historic ops
         self.cluster.dump_historic_ops(self.run_dir)
+        logger.debug("RUNDIR")
+        logger.debug(self.run_dir)
         common.sync_files(f'{self.run_dir}/*', self.out_dir)
         self.analyze(self.out_dir)
 
