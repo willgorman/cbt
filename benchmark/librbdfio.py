@@ -381,20 +381,16 @@ class LibrbdFio(Benchmark):
         for client in settings.getnodes('clients').split(','):
             host = settings.host_info(client)["host"]
             for i in range(self.volumes_per_client):
-                found = 0
+                found = 1
                 out_file = f'{out_dir}/output.{i:d}.{host}'
                 json_out_file = f'{out_dir}/json_output.{i:d}.{host}'
                 with open(out_file) as fd:
                     with open(json_out_file, 'w') as json_fd:
                         for line in fd.readlines():
                             if len(line.strip()) == 0:
-                                found = 0
                                 break
                             if found == 1:
                                 json_fd.write(line)
-                            if found == 0:
-                                if "Starting" in line:
-                                    found = 1
 
 
     def analyze(self, out_dir):
