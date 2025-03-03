@@ -1,0 +1,101 @@
+cluster:
+  use_existing: True
+  osds_per_node: 2
+  head: "100.80.49.62"
+  clients: ["nbs@172.16.1.210", "nbs@172.16.1.211", "nbs@172.16.1.212"]
+  osds: ["rocky@172.18.0.164"]
+  mons: ["rocky@172.18.0.164"]
+    #mons: ["localhost"]
+  fs: xfs
+  mkfs_opts: -f -i size=2048
+  mount_opts: -o inode64,noatime,logbsize=256k
+  conf_file: /Users/will.gorman/git/cbt/ceph.conf
+  ceph.conf: /Users/will.gorman/git/cbt/ceph.conf
+  iterations: 1
+  ceph_cmd: /Users/will.gorman/git/cbt/.flox/run/aarch64-linux.cbt.dev/bin/ceph
+  rados_cmd: /Users/will.gorman/git/cbt/.flox/run/aarch64-linux.cbt.dev/bin/rados
+  rbd_cmd: /Users/will.gorman/git/cbt/.flox/run/aarch64-linux.cbt.dev/bin/rbd
+  rebuild_every_test: False
+  tmp_dir: "/tmp/cbt"
+  pool_profiles:
+    rbd:
+      pg_size: 250
+      pgp_size: 250
+      replication: 'replicated'
+monitoring_profiles:
+# These monitor only the OSD node/process
+  collectl:
+    # These options indicate:
+    # collect 30 samples, summary mem and CPU util, each 5 secs for CPU samples, 10 sec for all other,
+    # process options: threads utilisation
+    # filter samples for CPUs 0 to 3 (e.g. Crimson IO reactor cores),
+    # filter samples for process osd (redundant),
+    # produce gnuplot file data format (aka csv) in output file (gziped)
+    #
+    args: '-c 30 -sZC -i 5:10 --procopts t --cpufilt 0-3 --procfilt cosd -P -f {collectl_dir}'
+  perf:
+    perf_cmd: 'perf'
+    # This collects 10 secs of data to produce flame graphs
+    args: 'record -e cycles:u --call-graph dwarf -i -p {pid} -o {perf_dir}/{pid}_osd_perf.out sleep 10'
+  top:
+    top_cmd: 'top'
+      # This collects 30 samples, Core and thread CPU utilisation
+    args: '-b -H -1 -p {pid} -n 30 > {top_dir}/{pid}_osd_top.out'
+benchmarks:
+  librbdfio:
+    cmd_path: '/usr/bin/fio'
+    # ToDo: consider a subdict that defines the global FIO options
+    # but we need to ensure backwards compatibility with existing .yaml
+    wait_pgautoscaler_timeout: 2 # in secs
+    use_existing_volumes: False
+    no_sudo: True
+    ## Global FIO options
+    pool_profile: 'rbd'
+    vol_size: 1024  # Volume size in Megabytes
+      #vol_name: 'fio_test_%d' # TBC. valid python format string
+      #rbdname: 'fio_test_%d'
+    idle_monitor_sleep: 5 # in seconds
+    fio_out_format: 'json'
+    iterations: 1
+    time: 30 # length of run
+    ramp: 3 # ramp up time
+    log_avg_msec: 100
+    log_iops: True
+    log_bw:  True
+    log_lat: True
+    poolname: 'rbd'
+    mode: 'randwrite'
+    iodepth: [1, 4 ,16]
+    numjobs: [1, 4, 8]
+    op_size: [4096] # block IO size in bytes
+    procs_per_client: [1]
+    volumes_per_client: [3] # volumes per ceph node
+      # for tests involving specific CPU cores:
+    # fio_cpu_set: '15-15'
+    # Optional FIO options for the /prefill stage
+    prefill:
+      blocksize: '4M'
+      numjobs: 1
+    # Each block below uses its own local options during its execution
+    workloads:
+      precondition:
+        jobname: 'precond1rw'
+        mode: 'randwrite'
+        numjobs: [ 2 ]
+        iodepth: [ 4, 8]
+        monitor: False # whether to run the monitors along the test
+      # test1:
+      #   jobname: 'rr'
+      #   mode: 'randread'
+      #   numjobs: [ 2, 8]
+      #   iodepth: [ 1, 16]
+      #     #numjobs: [ 1, 4, 8 ]
+      #     #iodepth: [ 1, 4, 8 ]
+      #   # ToDo: can we add a list of the monitoring subset we are interested for this workload?
+      # test2:
+      #   jobname: 'rw'
+      #   mode: 'randwrite'
+      #   numjobs: [ 2 ]
+      #   iodepth: [ 1 ]
+      #     #numjobs: [ 1, 4, 8 ]
+      #     #iodepth: [ 1, 4, 8 ]
