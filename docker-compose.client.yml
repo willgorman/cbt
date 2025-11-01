@@ -1,0 +1,46 @@
+version: '3.8'
+
+# Docker Compose configuration for CBT CLIENT NODE
+# This should be deployed on each host that will run benchmark workloads
+# For multi-host deployment, see docker/README.md
+
+services:
+  cbt-client:
+    build: .
+    image: cbt:latest
+    container_name: cbt-client
+    # Use host networking to allow direct access to Ceph cluster
+    # and to be reachable by head node without port mapping
+    network_mode: "host"
+    hostname: ${CLIENT_HOSTNAME:-cbt-client}
+    volumes:
+      # Mount Ceph configuration from host
+      - ${CEPH_CONF_DIR:-/etc/ceph}:/etc/ceph:ro
+      # Mount directory for authorized_keys (will be populated during setup)
+      - ${SSH_AUTH_DIR:-./ssh-auth}:/root/.ssh-incoming:ro
+    # Enable privilege mode for block device operations
+    privileged: true
+    environment:
+      - PDSH_SSH_ARGS=${PDSH_SSH_ARGS:--o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}
+    # Start SSH daemon and keep running
+    command: |
+      bash -c '
+        # Setup SSH authorized_keys
+        mkdir -p /root/.ssh
+        chmod 700 /root/.ssh
+
+        # Copy authorized keys if provided
+        if [ -f /root/.ssh-incoming/authorized_keys ]; then
+          cp /root/.ssh-incoming/authorized_keys /root/.ssh/authorized_keys
+          chmod 600 /root/.ssh/authorized_keys
+          echo "Loaded authorized_keys from volume"
+        else
+          echo "WARNING: No authorized_keys found. SSH access may not work."
+          echo "Create ${SSH_AUTH_DIR:-./ssh-auth}/authorized_keys with the head node public key"
+        fi
+
+        # Start SSH daemon
+        mkdir -p /run/sshd
+        echo "Starting SSH daemon..."
+        /usr/sbin/sshd -D
+      '

@@ -6,10 +6,14 @@ cluster:
   user: 'root'
 
   # Head node where CBT commands are executed
+  # SINGLE-HOST: Use container name (e.g., "cbt-head")
+  # MULTI-HOST: Use actual hostname/IP (e.g., "head.example.com" or "192.168.1.5")
   head: "cbt-head"
 
   # Client nodes that will run the benchmarks
-  # Add more clients as needed (must match docker-compose.yml)
+  # SINGLE-HOST: Use container names (e.g., ["cbt-client-1", "cbt-client-2"])
+  # MULTI-HOST: Use actual hostnames/IPs (e.g., ["client1.example.com", "client2.example.com"])
+  # Add more clients as needed
   clients: ["cbt-client-1", "cbt-client-2"]
 
   # Use existing Ceph cluster (mounted from host)

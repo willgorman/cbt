@@ -1,5 +1,10 @@
 version: '3.8'
 
+# Docker Compose configuration for SINGLE-HOST deployment
+# All containers (head + clients) run on the same host
+# For MULTI-HOST deployment, use docker-compose.head.yml and docker-compose.client.yml
+# See docker/README.md for multi-host deployment guide
+
 services:
   # Head node - where CBT commands are executed
   cbt-head:

@@ -3,7 +3,11 @@
 
 cluster:
   user: 'root'
+  # SINGLE-HOST: Use container name
+  # MULTI-HOST: Use actual hostname/IP of head host
   head: "cbt-head"
+  # SINGLE-HOST: Use container names
+  # MULTI-HOST: Use actual hostnames/IPs of client hosts
   clients: ["cbt-client-1", "cbt-client-2"]
   use_existing: True
   conf_file: '/etc/ceph/ceph.conf'

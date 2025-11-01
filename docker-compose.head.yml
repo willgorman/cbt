@@ -1,0 +1,29 @@
+version: '3.8'
+
+# Docker Compose configuration for CBT HEAD NODE
+# This should be deployed on the host that will run CBT commands
+# For multi-host deployment, see docker/README.md
+
+services:
+  cbt-head:
+    build: .
+    image: cbt:latest
+    container_name: cbt-head
+    # Use host networking to allow direct access to Ceph cluster
+    # and other hosts without NAT
+    network_mode: "host"
+    hostname: ${HEAD_HOSTNAME:-cbt-head}
+    volumes:
+      # Mount Ceph configuration from host
+      - ${CEPH_CONF_DIR:-/etc/ceph}:/etc/ceph:ro
+      # Mount SSH keys for passwordless access to clients
+      # Make sure the private key is readable
+      - ${SSH_KEY_DIR:-~/.ssh}:/root/.ssh:ro
+      # Mount archive directory for results
+      - ${ARCHIVE_DIR:-./archive}:/cbt/archive
+      # Mount test configurations
+      - ${CONFIG_DIR:-./configs}:/cbt/configs:ro
+    environment:
+      # Set the PDSH SSH args if needed
+      - PDSH_SSH_ARGS=${PDSH_SSH_ARGS:--o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}
+    command: tail -f /dev/null  # Keep container running

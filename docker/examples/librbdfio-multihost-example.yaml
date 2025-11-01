@@ -1,0 +1,92 @@
+# Multi-host librbdfio benchmark configuration example
+# This example shows how to configure CBT for multi-host Docker deployment
+
+cluster:
+  user: 'root'
+
+  # Head node - Use actual hostname or IP of the host running the head container
+  # Examples:
+  #   - hostname: "cbt-head-host.example.com"
+  #   - IP address: "192.168.1.100"
+  head: "cbt-head-host.example.com"
+
+  # Client nodes - Use actual hostnames or IPs of hosts running client containers
+  # These must be reachable from the head node via SSH
+  # Examples:
+  #   - hostnames: ["client1.example.com", "client2.example.com", "client3.example.com"]
+  #   - IP addresses: ["192.168.1.101", "192.168.1.102", "192.168.1.103"]
+  #   - mixed: ["client1.example.com", "192.168.1.102"]
+  clients: ["client1.example.com", "client2.example.com", "client3.example.com"]
+
+  # Use existing Ceph cluster (containers don't manage OSDs)
+  use_existing: True
+
+  # Ceph configuration file (mounted into containers at /etc/ceph)
+  conf_file: '/etc/ceph/ceph.conf'
+
+  # Number of test iterations
+  iterations: 1
+
+  # Temporary directory for operations
+  tmp_dir: "/tmp/cbt"
+
+  # Results archive directory (on head node)
+  archive_dir: "/cbt/archive"
+
+benchmarks:
+  librbdfio:
+    # Test duration in seconds
+    time: 300
+
+    # RBD volume size in MB (16 GB)
+    vol_size: 16384
+
+    # Test modes - will run each in sequence
+    mode: [write, read, randwrite, randread]
+
+    # Operation sizes in bytes
+    # 4M for sequential, 4K for random
+    op_size: [4194304, 4096]
+
+    # IO depth - number of outstanding I/Os
+    iodepth: [16, 64]
+
+    # Number of FIO jobs per volume
+    numjobs: [1]
+
+    # Path to fio binary in container
+    cmd_path: '/usr/bin/fio'
+
+    # Create new volumes (don't use existing)
+    use_existing_volumes: False
+
+    # Pool profile (defined in cluster config, or use 'default')
+    pool_profile: 'default'
+
+    # Number of RBD volumes per client
+    # With 3 clients and 2 volumes per client = 6 total volumes
+    volumes_per_client: 2
+
+    # Number of FIO processes per volume
+    procs_per_volume: 1
+
+    # Run for specified time (vs. until volume is filled)
+    time_based: True
+
+    # Ramp time in seconds (warmup, not measured)
+    ramp: 30
+
+    # Prefill configuration
+    prefill:
+      blocksize: '4M'
+      numjobs: '1'
+
+    # FIO output format
+    fio_out_format: 'json,normal'
+
+# Notes for multi-host deployment:
+# 1. Ensure all hosts can reach Ceph MONs and OSDs
+# 2. Ensure head host can SSH to all client hosts (containers use host networking)
+# 3. Use setup-multihost.sh for automated deployment
+# 4. Client containers must be running before executing benchmarks
+# 5. Results are stored in the archive directory on the head node
