@@ -1,0 +1,36 @@
+# Git files
+.git
+.gitignore
+
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Test files
+.pytest_cache
+.tox
+*.egg-info
+
+# Archive and output directories
+archive/
+results/
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation build files
+docs/_build
+
+# Example configs (we'll include specific ones)
+example/
+
+# Temporary files
+*.log
+tmp/

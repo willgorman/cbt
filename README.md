@@ -47,6 +47,41 @@ This module is most relevant for simulating the data path for applications
 that need a block device, but wont for whatever reason be ran inside a virtual
 machine.
 
+## DOCKER SUPPORT
+
+CBT can be run in Docker containers to provide a consistent and reproducible
+environment for benchmarking. Docker support is currently focused on the
+librbdfio benchmark module with support for additional modules planned.
+
+### Quick Start with Docker
+
+1. Build the Docker image:
+   ```bash
+   docker build -t cbt:latest .
+   ```
+
+2. Run the automated setup script:
+   ```bash
+   ./docker/setup.sh
+   ```
+
+3. Execute benchmarks:
+   ```bash
+   docker exec -it cbt-head bash
+   python3 cbt.py --archive=/cbt/archive /cbt/configs/librbdfio-simple.yaml
+   ```
+
+For detailed documentation on using CBT with Docker, including configuration
+examples and troubleshooting, see [docker/README.md](docker/README.md).
+
+### Docker Features
+
+- Single image for both head and client nodes
+- Support for librbdfio benchmarks with FIO and librbd
+- Easy orchestration with docker-compose
+- Automated SSH key distribution
+- Example configurations included
+
 ## PREREQUISITES
 
 CBT uses several libraries and tools to run:

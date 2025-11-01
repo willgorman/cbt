@@ -1,0 +1,76 @@
+# Simple librbdfio benchmark configuration for Docker deployment
+# This configuration runs basic sequential and random read/write tests
+
+cluster:
+  # User for remote operations (use root in containers)
+  user: 'root'
+
+  # Head node where CBT commands are executed
+  head: "cbt-head"
+
+  # Client nodes that will run the benchmarks
+  # Add more clients as needed (must match docker-compose.yml)
+  clients: ["cbt-client-1", "cbt-client-2"]
+
+  # Use existing Ceph cluster (mounted from host)
+  use_existing: True
+
+  # Ceph configuration file (mounted from host to /etc/ceph)
+  conf_file: '/etc/ceph/ceph.conf'
+
+  # Number of iterations to run
+  iterations: 1
+
+  # Temporary directory for CBT operations
+  tmp_dir: "/tmp/cbt"
+
+  # Archive directory for results (mounted from host)
+  archive_dir: "/cbt/archive"
+
+benchmarks:
+  # librbdfio benchmark - FIO with librbd engine
+  librbdfio:
+    # Test duration in seconds
+    time: 300
+
+    # RBD volume size in MB
+    vol_size: 16384  # 16 GB
+
+    # Test modes to run
+    mode: [write, read, randwrite, randread]
+
+    # Operation sizes in bytes (4MB, 1MB, 4KB)
+    op_size: [4194304, 1048576, 4096]
+
+    # IO depth - number of outstanding I/Os
+    iodepth: [16, 64]
+
+    # Number of jobs per volume
+    numjobs: [1]
+
+    # Path to fio binary
+    cmd_path: '/usr/bin/fio'
+
+    # Pool configuration
+    use_existing_volumes: False
+    pool_profile: 'default'
+
+    # Number of RBD volumes per client
+    volumes_per_client: 1
+
+    # Number of FIO processes per volume
+    procs_per_volume: 1
+
+    # Prefill configuration
+    prefill:
+      blocksize: '4M'
+      numjobs: '1'
+
+    # FIO output format
+    fio_out_format: 'json,normal'
+
+    # Time-based test (run for specified time vs. size)
+    time_based: True
+
+    # Ramp time in seconds (not monitored)
+    ramp: 30

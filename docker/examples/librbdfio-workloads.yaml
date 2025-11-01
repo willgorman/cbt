@@ -1,0 +1,77 @@
+# Advanced librbdfio configuration using workloads feature
+# Demonstrates workload-based testing for performance curves
+
+cluster:
+  user: 'root'
+  head: "cbt-head"
+  clients: ["cbt-client-1", "cbt-client-2"]
+  use_existing: True
+  conf_file: '/etc/ceph/ceph.conf'
+  iterations: 1
+  tmp_dir: "/tmp/cbt"
+  archive_dir: "/cbt/archive"
+
+benchmarks:
+  librbdfio:
+    # Global FIO options (can be overridden per workload)
+    time: 300
+    vol_size: 32768  # 32 GB
+    cmd_path: '/usr/bin/fio'
+    use_existing_volumes: False
+    pool_profile: 'default'
+    volumes_per_client: 2
+    procs_per_volume: 1
+    time_based: True
+    ramp: 30
+
+    # Workloads - multiple test scenarios
+    workloads:
+      # 4K Random Read Performance
+      "4k_randread":
+        mode: "randread"
+        op_size: 4096
+        numjobs: [1, 2, 4]
+        iodepth: [16, 32, 64, 128]
+        monitor: True
+
+      # 4K Random Write Performance
+      "4k_randwrite":
+        mode: "randwrite"
+        op_size: 4096
+        numjobs: [1, 2, 4]
+        iodepth: [16, 32, 64, 128]
+        monitor: True
+
+      # 1MB Sequential Write
+      "1mb_seqwrite":
+        mode: "write"
+        op_size: 1048576
+        numjobs: [1]
+        iodepth: [16, 32, 64]
+        monitor: True
+
+      # 1MB Sequential Read
+      "1mb_seqread":
+        mode: "read"
+        op_size: 1048576
+        numjobs: [1]
+        iodepth: [16, 32, 64]
+        monitor: True
+
+      # Mixed Read/Write 70/30
+      "mixed_70_30":
+        mode: "randrw"
+        op_size: 4096
+        rwmixread: 70
+        rwmixwrite: 30
+        numjobs: [1, 2]
+        iodepth: [32, 64]
+        monitor: True
+
+    # Prefill configuration
+    prefill:
+      blocksize: '4M'
+      numjobs: '1'
+
+    # FIO output format
+    fio_out_format: 'json,normal'

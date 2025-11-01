@@ -1,0 +1,41 @@
+# Example Ceph configuration file for CBT Docker deployment
+# Copy this to your ceph-config directory and customize for your cluster
+
+[global]
+    # Cluster identification
+    fsid = <your-cluster-fsid>
+    mon_initial_members = <mon-hostnames>
+    mon_host = <mon-ip-addresses>
+
+    # Authentication
+    auth_cluster_required = cephx
+    auth_service_required = cephx
+    auth_client_required = cephx
+
+    # Network configuration
+    # Update these to match your Ceph cluster network
+    public_network = 10.0.0.0/24
+    cluster_network = 10.0.0.0/24
+
+    # RBD cache configuration (adjust for your workload)
+    rbd_cache = true
+    rbd_cache_size = 268435456  # 256 MB
+    rbd_cache_max_dirty = 201326592  # 192 MB
+    rbd_cache_target_dirty = 134217728  # 128 MB
+    rbd_cache_max_dirty_age = 2
+
+    # Client configuration
+    # Increase for better performance in benchmarks
+    ms_dispatch_throttle_bytes = 1048576000
+
+[client]
+    # Client-specific settings
+    rbd_default_features = 1  # Only layering, for kernel compatibility
+
+# Example keyring format (create separate ceph.client.admin.keyring file):
+# [client.admin]
+#     key = <your-admin-key>
+#     caps mds = "allow *"
+#     caps mgr = "allow *"
+#     caps mon = "allow *"
+#     caps osd = "allow *"
