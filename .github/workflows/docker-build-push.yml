@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - 'claude/create-docker-images-*'  # TEMPORARY: Remove before merging to main
     tags:
       - 'v*.*.*'
   pull_request:
