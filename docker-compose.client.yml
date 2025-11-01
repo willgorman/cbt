@@ -6,8 +6,12 @@ version: '3.8'
 
 services:
   cbt-client:
-    build: .
-    image: cbt:latest
+    # Use pre-built image from ghcr.io or build locally
+    # Set CBT_IMAGE env var to use pre-built: CBT_IMAGE=ghcr.io/ceph/cbt:latest
+    image: ${CBT_IMAGE:-cbt:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: cbt-client
     # Use host networking to allow direct access to Ceph cluster
     # and to be reachable by head node without port mapping

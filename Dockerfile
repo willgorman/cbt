@@ -3,6 +3,23 @@
 
 FROM ubuntu:22.04
 
+# Build arguments for metadata
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+
+# Image metadata following OCI annotations
+LABEL org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.authors="Ceph Community" \
+      org.opencontainers.image.url="https://github.com/ceph/cbt" \
+      org.opencontainers.image.documentation="https://github.com/ceph/cbt/blob/master/docker/README.md" \
+      org.opencontainers.image.source="https://github.com/ceph/cbt" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.vendor="Ceph Community" \
+      org.opencontainers.image.title="CBT - Ceph Benchmarking Tool" \
+      org.opencontainers.image.description="Docker container for running Ceph benchmarks with librbdfio support"
+
 # Avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 

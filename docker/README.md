@@ -34,6 +34,62 @@ CBT Docker supports two deployment modes:
    - Client keyring with appropriate permissions
    - Network connectivity from Docker containers to Ceph cluster
 
+## Using Pre-Built Images
+
+Pre-built Docker images are automatically published to GitHub Container Registry (ghcr.io) for every release and main branch push.
+
+### Available Image Tags
+
+- `latest` - Latest build from the main branch
+- `v*.*.*` - Specific version tags (e.g., v1.0.0)
+- `main` - Latest build from main branch
+- `<branch>-<sha>` - Specific commit builds
+
+### Pulling the Image
+
+```bash
+# Pull the latest version
+docker pull ghcr.io/ceph/cbt:latest
+
+# Pull a specific version
+docker pull ghcr.io/cbt:v1.0.0
+
+# Pull from main branch
+docker pull ghcr.io/cbt:main
+```
+
+**Note:** The repository name in the image URL should match your GitHub repository. If this is a fork or different repo, replace `ceph/cbt` with `owner/repo`.
+
+### Using Pre-Built Images with Docker Compose
+
+You can use the pre-built images instead of building locally by modifying the docker-compose files:
+
+```yaml
+services:
+  cbt-head:
+    image: ghcr.io/ceph/cbt:latest  # Use pre-built image
+    # Remove or comment out 'build: .' line
+    container_name: cbt-head
+    # ... rest of configuration
+```
+
+This eliminates the need to run `docker build` locally.
+
+### Quick Start with Pre-Built Image
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/ceph/cbt:latest
+
+# Run single-host setup (will use pre-built image)
+./docker/setup.sh
+
+# Or for multi-host deployment
+./docker/setup-multihost.sh --clients client1,client2
+```
+
+The setup scripts will automatically use the pre-built image if available, falling back to local build if needed.
+
 ## Quick Start (Single-Host)
 
 **Note:** This section covers single-host deployment. For multi-host deployment (RECOMMENDED for production), see the [Multi-Host Deployment](#multi-host-deployment) section below.

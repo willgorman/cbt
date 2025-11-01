@@ -8,8 +8,12 @@ version: '3.8'
 services:
   # Head node - where CBT commands are executed
   cbt-head:
-    build: .
-    image: cbt:latest
+    # Use pre-built image from ghcr.io or build locally
+    # Set CBT_IMAGE env var to use pre-built: CBT_IMAGE=ghcr.io/ceph/cbt:latest
+    image: ${CBT_IMAGE:-cbt:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: cbt-head
     hostname: cbt-head
     networks:
@@ -27,8 +31,10 @@ services:
 
   # Client node 1
   cbt-client-1:
-    build: .
-    image: cbt:latest
+    image: ${CBT_IMAGE:-cbt:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: cbt-client-1
     hostname: cbt-client-1
     networks:
@@ -49,8 +55,10 @@ services:
 
   # Client node 2 (optional - can be scaled)
   cbt-client-2:
-    build: .
-    image: cbt:latest
+    image: ${CBT_IMAGE:-cbt:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: cbt-client-2
     hostname: cbt-client-2
     networks:

@@ -55,21 +55,26 @@ librbdfio benchmark module with support for additional modules planned.
 
 ### Quick Start with Docker
 
-1. Build the Docker image:
-   ```bash
-   docker build -t cbt:latest .
-   ```
+Pre-built images are available from GitHub Container Registry:
 
-2. Run the automated setup script:
-   ```bash
-   ./docker/setup.sh
-   ```
+```bash
+# Pull the latest image
+docker pull ghcr.io/ceph/cbt:latest
 
-3. Execute benchmarks:
-   ```bash
-   docker exec -it cbt-head bash
-   python3 cbt.py --archive=/cbt/archive /cbt/configs/librbdfio-simple.yaml
-   ```
+# Run the automated setup script
+./docker/setup.sh
+
+# Execute benchmarks
+docker exec -it cbt-head bash
+python3 cbt.py --archive=/cbt/archive /cbt/configs/librbdfio-simple.yaml
+```
+
+Or build locally:
+
+```bash
+docker build -t cbt:latest .
+./docker/setup.sh
+```
 
 For detailed documentation on using CBT with Docker, including configuration
 examples and troubleshooting, see [docker/README.md](docker/README.md).
